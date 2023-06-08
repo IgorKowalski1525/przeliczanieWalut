@@ -86,7 +86,7 @@ body
 
             }
         }
-    //Funkcja generuje tabelę zawierającą historię poprzednich przewalutowań
+    //Funkcja generuje tabelę zawierającą historię poprzednich przewalutowań przechowywanych w bazie danych
         function generujTabelePrzewalutowan($kwoty, $zrodlowe, $docelowe, $wyniki)
         {
             echo 
@@ -132,13 +132,12 @@ body
         <p>
             Waluta źródłowa: <select name="walutaZrodlowa">
                 <?php
-            //Skrypt tworzy wszystkie opcje do rozwijanej listy walut
+            //Skrypt tworzy wszystkie opcje do rozwijanej listy walut, ustawiając jako wybraną tą, która została poprzednio wybrana przez użytkownika
+            //aby użytkownik nie musiał za każdym razem zaznaczać opcji od nowa
                 for($i = 0; $i < count($nazwy); $i++)
                 {
                     $nazwaWaluty = $nazwy[$i];
                     $index = $i;
-                //Skrypt sprawdza czy wartość danej opcji pokrywa się z tą wybraną wcześniej przez użytkownika, która jest zapisana w zmiennej globalnej $_POST,
-                // i zaznacza ją jako podstawową wartość, aby użytkownik nie musiał za każdym razem zaznaczać opcji od nowa
                     if(isset($_POST['walutaZrodlowa']) && $_POST['walutaZrodlowa'] == $index)
                     {
                         echo "<option value='".$index."' selected = 'selected'>".$nazwaWaluty."</option>";
@@ -152,13 +151,12 @@ body
             </select>
             Waluta docelowa: <select name="walutaDocelowa">
                 <?php
-                //Skrypt tworzy wszystkie opcje do rozwijanej listy walut
+                //Skrypt tworzy wszystkie opcje do rozwijanej listy walut, ustawiając jako wybraną tą, która została poprzednio wybrana przez użytkownika
+                //aby użytkownik nie musiał za każdym razem zaznaczać opcji od nowa
                 for($i = 0; $i < count($kody); $i++)
                 {
                     $nazwaWaluty = $nazwy[$i];
                     $index = $i;
-                //Skrypt sprawdza czy wartość danej opcji pokrywa się z tą wybraną wcześniej przez użytkownika, która jest zapisana w zmiennej globalnej $_POST,
-                // i zaznacza ją jako podstawową wartość, aby użytkownik nie musiał za każdym razem zaznaczać opcji od nowa
                     if(isset($_POST['walutaDocelowa']) && $_POST['walutaDocelowa'] == $index)
                     {
                         echo "<option value='".$index."' selected = 'selected'>".$nazwaWaluty."</option>";
@@ -173,6 +171,7 @@ body
         </p>
         <p id="wynik">
             <?php
+            //Skrypt pobiera z bazy danych 15 ostatnich rekordów z tabeli przewalutowania i tworzy na ich podstawie tablice 
                 przeliczWalute($bazaDanych, $kursy, $kody, $nazwy);
                 $queryDoZapisanych = $bazaDanych->query("SELECT * from przewalutowania order by Id desc limit 15");
                 $podaneKwoty = array();
