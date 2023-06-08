@@ -22,7 +22,7 @@ body
 </style>
 <body>
     <?php
-        $bazaDanych = mysqli_connect("localhost", "root", "","waluty");
+        $bazaDanych = mysqli_connect("sql205.infinityfree.com", "if0_34375307", "yaQTOcfnvENMfu","if0_34375307_waluty");
     //Funkcja pobiera dane z API, dekoduje je z formatu json na tablicę PHP, usuwa poprzednie dane z tabeli i zastępuje je nowymi 
         function pobierzWaluty($baza)
         {
@@ -35,9 +35,15 @@ body
             {
                 $baza->query("INSERT INTO kursy_walut (currency, code, mid) VALUES ('".$rate->currency."', '".$rate->code."', '".$rate->mid."');");
             }
+            $baza->query("INSERT INTO kursy_walut (currency, code, mid) VALUES ('polski złoty', 'PLN', '1');");
         }
+        //Funkcja zapisuje obecne przewalutowanie do bazy danych, pod warunkiem, że nie jest ono identyczne jak poprzednie
         function zapiszWynik($baza, $kwota, $walutaZrodlowa, $walutaDocelowa, $wynik)
         {
+            $wiersz = $baza->query("SELECT podana_kwota,waluta_zrodlowa, waluta_docelowa, wynik from przewalutowania order by id desc")->fetch_array();
+            if($wiersz['podana_kwota'] == $kwota && $wiersz['waluta_zrodlowa'] == $walutaZrodlowa && $wiersz['waluta_docelowa'] == $walutaDocelowa &&  $wiersz['wynik']==$wynik){
+            return;
+            }
             $baza->query("INSERT INTO przewalutowania (podana_kwota, waluta_zrodlowa,waluta_docelowa, wynik) VALUES ('".$kwota."','".$walutaZrodlowa."','".$walutaDocelowa."'
             ,'".$wynik."');");
         }
@@ -80,6 +86,7 @@ body
 
             }
         }
+    //Funkcja generuje tabelę zawierającą historię poprzednich przewalutowań
         function generujTabelePrzewalutowan($kwoty, $zrodlowe, $docelowe, $wyniki)
         {
             echo 
